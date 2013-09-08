@@ -13,34 +13,6 @@
         android:gravity="center"
         android:src="@drawable/child" />
 
-    <TextView
-        android:id="@+id/textView1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="20dp"
-        android:text="Filter : Vintage"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
-
-    <Button
-        android:id="@+id/backButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/textView1"
-        android:layout_alignBottom="@+id/textView1"
-        android:layout_alignParentLeft="true"
-        android:text="Back" />
-
-    <Button
-        android:id="@+id/frontButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/textView1"
-        android:layout_alignBottom="@+id/textView1"
-        android:layout_alignParentRight="true"
-        android:text="Front" />
-
     <Button
         android:id="@+id/origButton"
         android:layout_width="wrap_content"
@@ -50,4 +22,55 @@
         android:layout_marginTop="16dp"
         android:text="Original" />
 
+   <ImageButton
+        android:id="@+id/filter_backButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/imgView"
+        android:layout_alignParentBottom="true"
+        android:layout_marginLeft="40dp"
+        android:background="@color/transparent"
+        android:src="@android:drawable/ic_media_previous"
+        android:scaleX="2"
+        android:scaleY="2" />
+    <ImageButton
+        android:id="@+id/filter_frontButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginLeft="29dp"
+        android:layout_toRightOf="@+id/filterName"
+        android:background="@color/transparent"
+        android:src="@android:drawable/ic_media_next"
+         android:scaleX="2"
+        android:scaleY="2" />
+
+    
+
+    <Button
+        android:id="@+id/backButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:text="Back"
+         />
+
+    <Button
+        android:id="@+id/frontButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:text="Front" />
+
+    <TextView
+        android:id="@+id/filterName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:text="Filter : Vintage"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+          
 </RelativeLayout>
