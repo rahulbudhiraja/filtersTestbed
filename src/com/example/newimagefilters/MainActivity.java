@@ -162,7 +162,7 @@ public class MainActivity extends Activity
 			if(activeFilter==0)
 					filterName.setText("Vintage");
 			else if(activeFilter==1)
-					filterName.setText("XPro II");
+					filterName.setText("Calm Breeze");
 //			index=index%resIds.size();
 			
 			bmptobeManipulated=null;
