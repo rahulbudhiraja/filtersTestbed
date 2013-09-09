@@ -178,7 +178,7 @@ public class MainActivity extends Activity
 				else if(activeFilter==1)
 				   implementXPro2Filter();
 				
-				
+				 
 				imgView.setImageBitmap(null);
 				imgView.setImageBitmap(bmpmutable);
 			}
