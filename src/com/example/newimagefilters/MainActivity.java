@@ -13,6 +13,7 @@ import android.graphics.Paint;
 import android.graphics.Paint.Style;
 import android.graphics.PorterDuff.Mode;
 import android.graphics.PorterDuffXfermode;
+import android.graphics.RadialGradient;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.util.Log;
@@ -30,7 +31,7 @@ public class MainActivity extends Activity
 {
 	
 	ImageView imgView;
-	Bitmap bmptobeManipulated=null,bmpmutable=null,bmpmutable_bgLayer=null,bmpmutable_fgLayer=null;
+	Bitmap bmptobeManipulated=null,bmpmutable=null,bmpmutable_bgLayer=null,bmpmutable_fgLayer=null,bmpmutable_upperfgLayer=null;
 	Paint multiplyPaint;
 	Field[] drawables;
 	Vector <Integer> resIds;
@@ -176,8 +177,8 @@ public class MainActivity extends Activity
 				if(activeFilter==0)
 				   implementVintageFilter();
 				else if(activeFilter==1)
-				   implementXPro2Filter();
-				
+				   //implementXPro2Filter();
+				implementEarlyBirdFilter();
 				 
 				imgView.setImageBitmap(null);
 				imgView.setImageBitmap(bmpmutable);
@@ -188,11 +189,14 @@ public class MainActivity extends Activity
 			
 		}
 		};
+	
 	public void onStart()
 	{
 		super.onStart();
 	
 	}
+	
+
 	
 	private void implementXPro2Filter()
 	{
@@ -209,7 +213,6 @@ public class MainActivity extends Activity
 	    double contrast_value=20;
 	    double contrast = Math.pow((100 + contrast_value) / 100, 2);
 
-	 
 		 for(int x = 0; x < bmpmutable.getWidth(); ++x) {
 		      for(int y = 0; y < bmpmutable.getHeight(); ++y) {
 		        // get pixel color
@@ -300,6 +303,258 @@ public class MainActivity extends Activity
 		 
 	}
 	
+	private void implementVividFilter()
+	{
+		
+		
+		bmpmutable=bmptobeManipulated.copy(Bitmap.Config.ARGB_8888, true);
+		bmpmutable=sharpen(bmpmutable,11);
+		
+		bmpmutable_bgLayer=bmptobeManipulated.copy(Bitmap.Config.ARGB_8888, true);
+		bmpmutable_fgLayer=bmptobeManipulated.copy(Bitmap.Config.ARGB_8888, true);
+		
+		int rgbval[]=new int[bmpmutable.getWidth()*bmpmutable.getHeight()];
+		bmpmutable.getPixels(rgbval, 0, bmpmutable.getWidth(), 0, 0,  bmpmutable.getWidth(), bmpmutable.getHeight());
+		
+		
+		int A, R, G, B;
+	    int pixel;
+	    
+	    
+	    double contrast_value=40;
+	    double contrast = Math.pow((100 + contrast_value) / 100, 2);
+
+		 for(int x = 0; x < bmpmutable.getWidth(); ++x) {
+		      for(int y = 0; y < bmpmutable.getHeight(); ++y) {
+		        // get pixel color
+		        pixel = bmpmutable.getPixel(x, y);
+		        // apply filtering on each channel R, G, B
+		        
+		        A=(int)Color.alpha(pixel);
+		        R = (int)(Color.red(pixel));
+		        G = (int)(Color.green(pixel));
+		        B = (int)(Color.blue(pixel));
+		        
+		        contrast_value=20;
+		        contrast = Math.pow((100 + contrast_value) / 100, 2);
+		        R = (int)(((((R / 255.0) - 0.5) * contrast) + 0.5) * 255.0);
+		        G = (int)(((((G / 255.0) - 0.5) * contrast) + 0.5) * 255.0);
+		       // B = (int)(((((B / 255.0) - 0.5) * contrast) + 0.5) * 255.0);
+//		       
+		        R-=5;G-=5;B-=5;
+		        
+		        contrast_value=5;
+		        contrast = Math.pow((100 + contrast_value) / 100, 2);
+		        
+		        R = (int)(((((R / 255.0) - 0.5) * contrast) + 0.5) * 255.0);
+		        G = (int)(((((G / 255.0) - 0.5) * contrast) + 0.5) * 255.0);
+		        B = (int)(((((B / 255.0) - 0.5) * contrast) + 0.5) * 255.0);
+//			     
+		        
+		        
+		        
+		        if(R > 255) { R = 255; }
+	              else if(R < 0) { R = 0; }
+	         
+	            
+	              if(G > 255) { G = 255; }
+	              else if(G < 0) { G = 0; }
+	         
+	             
+	              if(B > 255) { B = 255; }
+	              else if(B < 0) { B = 0; }
+		        
+	              bmpmutable.setPixel(x, y, Color.argb(A, R, G, B));
+	               
+		      }
+		 }
+		 
+		 Canvas combinedCanvas=new Canvas(bmpmutable);
+			
+			combinedCanvas.drawBitmap(bmpmutable,0,0,null);
+			
+	}
+	
+	private void implementEarlyBirdFilter()
+	{
+		bmpmutable=bmptobeManipulated.copy(Bitmap.Config.ARGB_8888, true);
+		bmpmutable_bgLayer=bmptobeManipulated.copy(Bitmap.Config.ARGB_8888, true);
+		bmpmutable_fgLayer=bmptobeManipulated.copy(Bitmap.Config.ARGB_8888, true);
+		bmpmutable_upperfgLayer=bmptobeManipulated.copy(Bitmap.Config.ARGB_8888, true);
+		
+		//bmpmutable=applySaturationFilter(bmpmutable,32);
+		
+		int rgbval[]=new int[bmpmutable.getWidth()*bmpmutable.getHeight()];
+		bmpmutable.getPixels(rgbval, 0, bmpmutable.getWidth(), 0, 0,  bmpmutable.getWidth(), bmpmutable.getHeight());
+		
+		
+		int A, R, G, B;
+	    int pixel;
+	 
+	    float[] pixelHSV = new float[3];
+	    double contrast_value=36;
+	    double contrast = Math.pow((100 + contrast_value) / 100, 2);
+	    
+	    int tempColor=0;
+//	    
+	    // scan through all pixels
+	    for(int x = 0; x < bmpmutable.getWidth(); ++x) {
+	      for(int y = 0; y < bmpmutable.getHeight(); ++y) {
+	        // get pixel color
+	        pixel = bmpmutable.getPixel(x, y);
+	        
+	        Color.colorToHSV(pixel, pixelHSV);
+	        
+	      pixelHSV[1]-=0.15;
+	      
+	      if(pixelHSV[1]<=0)
+	    	  pixelHSV[1]=0;
+	    	  
+	      pixel=Color.HSVToColor(Color.alpha(pixel),pixelHSV);
+	        
+	        
+	        
+	        // apply filtering on each channel R, G, B
+	        A = Color.alpha(pixel);
+	        R = (int)    ((Color.red(pixel) *1.19)  )+42 ;
+	        G = (int)((Color.green(pixel)*1.19));
+	        B = (int)((Color.blue(pixel)*1.19));
+	        
+	       
+	        R-=8;G-=8;B-=8;
+	        
+	        contrast_value=4;
+	        contrast = Math.pow((100 + contrast_value) / 100, 2);
+	        
+	        R = (int)(((((R / 255.0) - 0.5) * contrast) + 0.5) * 255.0);
+	        G = (int)(((((G / 255.0) - 0.5) * contrast) + 0.5) * 255.0);
+	        B = (int)(((((B / 255.0) - 0.5) * contrast) + 0.5) * 255.0);
+		     
+	        
+	        
+	        
+	        	  if(R > 255) { R = 255; }
+	              else if(R < 0) { R = 0; }
+	         
+	            
+	              if(G > 255) { G = 255; }
+	              else if(G < 0) { G = 0; }
+	         
+	             
+	              if(B > 255) { B = 255; }
+	              else if(B < 0) { B = 0; }
+	              
+	              
+	              tempColor=Color.argb(A, R, G, B);
+	              
+	              Color.colorToHSV(tempColor, pixelHSV);
+	              
+	              pixelHSV[1]-=0.17;
+	    	      
+	    	      if(pixelHSV[1]<=0)
+	    	    	  pixelHSV[1]=0;
+	    	    	  
+	    	      pixel=Color.HSVToColor(Color.alpha(tempColor),pixelHSV);
+//	    	        
+	    	      A = Color.alpha(pixel);
+	  	        R = (int)    ((Color.red(pixel) )  )-18 ;
+	  	        G = (int)((Color.green(pixel)))-20;
+	  	        B = (int)((Color.blue(pixel)))-20;
+	              
+	              
+
+	        	  if(R > 255) { R = 255; }
+	              else if(R < 0) { R = 0; }
+	         
+	            
+	              if(G > 255) { G = 255; }
+	              else if(G < 0) { G = 0; }
+	         
+	             
+	              if(B > 255) { B = 255; }
+	              else if(B < 0) { B = 0; }
+	              
+	              
+	        // set new color pixel to output bitmap
+	        bmpmutable_bgLayer.setPixel(x, y, Color.argb(A, R, G, B));
+	      }
+	    }
+		
+		Paint p=new Paint(Paint.ANTI_ALIAS_FLAG);
+		
+		p.setARGB(255,252,243,214);
+		p.setStyle(Style.FILL);
+		
+        p.setFilterBitmap(false);
+        
+        
+        multiplyPaint=new Paint(Paint.ANTI_ALIAS_FLAG);
+		multiplyPaint.setXfermode(new PorterDuffXfermode(Mode.MULTIPLY));
+//		multiplyPaint.setStyle(Style.FILL);
+		multiplyPaint.setFilterBitmap(false);
+	//	multiplyPaint.setColorFilter(new LightingColorFilter(0xffffff, 0x880000));
+		
+		
+
+		/* New foreground layer*/
+		/*		
+		Canvas upperfgCanvas=new Canvas(bmpmutable_upperfgLayer);
+		Paint tempPaint=new Paint();
+		
+		tempPaint.setARGB(255, 184, 184, 184);
+		tempPaint.setStyle(Style.FILL);
+		tempPaint.setFilterBitmap(false);
+		
+		upperfgCanvas.drawRect(new Rect(0,0,bmpmutable.getWidth(),bmpmutable.getHeight()), tempPaint);
+		
+		// Draw transparent circle into tempBitmap
+	    Paint p2 = new Paint();
+	   
+	    p2.setColor(0xFFFFFFFF);
+
+	    p2.setDither(true);
+	    upperfgCanvas.drawCircle(bmpmutable.getWidth()/2,bmpmutable.getHeight()/2, bmpmutable.getWidth()/2-40, p2);
+		
+	
+		
+//		int topPixel,bottomPixel;
+//		  // scan through all pixels
+//	    for(int x = 0; x < bmpmutable_upperfgLayer.getWidth(); ++x) {
+//	      for(int y = 0; y < bmpmutable_upperfgLayer.getHeight(); ++y) {
+//	        // get pixel color
+//	    	  
+//	    	  topPixel = bmpmutable_upperfgLayer.getPixel(x, y);
+//	          bottomPixel= bmpmutable_fgLayer.getPixel(x,y);
+//	        
+//	        
+//	        bmpmutable_fgLayer.setPixel(x, y, Color.argb(channelColorBurn(Color.alpha(topPixel),Color.alpha(bottomPixel)), channelColorBurn(Color.red(topPixel),Color.red(bottomPixel)), channelColorBurn(Color.green(topPixel),Color.green(bottomPixel)), channelColorBurn(Color.blue(topPixel),Color.blue(bottomPixel))));
+//	      }
+//	      }
+//		
+		*/
+		//fgCanvas.drawBitmap(bmptobeManipulated,0,0, multiplyPaint);
+		
+	    
+		Canvas fgCanvas=new Canvas(bmpmutable_fgLayer);
+
+		// set the blending mode to multiply ..
+		
+		
+		fgCanvas.drawRect(new Rect(0,0,bmpmutable.getWidth(),bmpmutable.getHeight()), p);
+		Canvas combinedCanvas=new Canvas(bmpmutable);
+		
+//		combinedCanvas.drawBitmap(bmpmutable_upperfgLayer,0,0,null); 
+		
+		combinedCanvas.drawBitmap(bmpmutable_fgLayer,0,0,null);
+//		
+		combinedCanvas.drawBitmap(bmpmutable_bgLayer,0,0,multiplyPaint);
+		
+		
+		
+		
+		
+	}
+	
 	private void implementVintageFilter() {
 		// TODO Auto-generated method stub
 		bmpmutable=bmptobeManipulated.copy(Bitmap.Config.ARGB_8888, true);
@@ -378,6 +633,91 @@ public class MainActivity extends Activity
 	}
 
 	
+	public static Bitmap sharpen(Bitmap src, double weight) {
+		  double[][] SharpConfig = new double[][] {
+		    { 0 , -2    , 0  },
+		    { -2, weight, -2 },
+		    { 0 , -2    , 0  }
+		  };
+		  ConvolutionMatrix convMatrix = new ConvolutionMatrix(3);
+		  convMatrix.applyConfig(SharpConfig);
+		  convMatrix.Factor = weight - 8;
+		  return ConvolutionMatrix.computeConvolution3x3(src, convMatrix);
+		}
 	
+	public static Bitmap applySaturationFilter(Bitmap source, int level) {
+        // get image size
+        int width = source.getWidth();
+        int height = source.getHeight();
+        int[] pixels = new int[width * height];
+        float[] HSV = new float[3];
+        // get pixel array from source
+        source.getPixels(pixels, 0, width, 0, 0, width, height);
+
+        int index = 0;
+       
+        // iteration through pixels
+        for(int y = 0; y < height; ++y) {
+            for(int x = 0; x < width; ++x) {
+                // get current index in 2D-matrix
+                index = y * width + x;
+                // convert to HSV
+                Color.colorToHSV(pixels[index], HSV);
+                // increase Saturation level
+                
+                HSV[1] *= level;
+                HSV[1] = (float) Math.max(0.0, Math.min(HSV[1], 1.0));
+                // take color back
+                pixels[index] |= Color.HSVToColor(HSV);
+            }
+        }
+        // output bitmap
+        Bitmap bmOut = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        bmOut.setPixels(pixels, 0, width, 0, 0, width, height);
+        return bmOut;
+    }
+	private void drawFoggyWindowWithTransparentCircle(Bitmap foggyWindowBmp ,
+	        float circleX, float circleY, float radius,Canvas combinedCanvas) {
+
+	    // Get the "foggy window" bitmap
+	   
+
+	    // Create a temporary bitmap
+	    Bitmap tempBitmap = Bitmap.createBitmap(
+	            foggyWindowBmp.getWidth(),
+	            foggyWindowBmp.getHeight(),
+	            Bitmap.Config.ARGB_8888);
+	    Canvas tempCanvas = new Canvas(tempBitmap);
+
+	    // Copy foggyWindowBmp into tempBitmap
+	    tempCanvas.drawBitmap(foggyWindowBmp, 0, 0, null);
+
+	    // Create a radial gradient
+	    RadialGradient gradient = new android.graphics.RadialGradient(
+	            circleX, circleY,
+	            radius, 0xFFFFFFFF, 0xFFB8B8B8,
+	            android.graphics.Shader.TileMode.CLAMP);
+
+	    // Draw transparent circle into tempBitmap
+	    Paint p = new Paint();
+	    p.setShader(gradient);
+	    p.setColor(0xFF000000);
+	    p.setXfermode(new PorterDuffXfermode(Mode.DST_OUT));
+	    tempCanvas.drawCircle(circleX, circleY, radius, p);
+
+	    // Draw tempBitmap onto the screen (over what's already there)
+	    combinedCanvas.drawBitmap(tempBitmap, 0, 0, null);
+	}
+	
+	public static double normalize ( int col ) 
+	{
+		return col / 255.0;
+	}
+	
+	public static int channelColorBurn ( int top, int bottom ) {
+	    if ( top == 0 ) return 0; // We don't want to divide by zero
+	    int col = (int) ( 255 * ( 1 - ( 1 - normalize( bottom ) ) / normalize( top ) ) );
+	    return ( col <0 ) ? 0 : col;
+	}
 	
 }
