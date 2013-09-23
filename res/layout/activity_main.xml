@@ -32,7 +32,8 @@
         android:background="@color/transparent"
         android:src="@android:drawable/ic_media_previous"
         android:scaleX="2"
-        android:scaleY="2" />
+        android:scaleY="2"
+       android:visibility="gone" />
     <ImageButton
         android:id="@+id/filter_frontButton"
         android:layout_width="wrap_content"
@@ -43,7 +44,8 @@
         android:background="@color/transparent"
         android:src="@android:drawable/ic_media_next"
          android:scaleX="2"
-        android:scaleY="2" />
+        android:scaleY="2" 
+        android:visibility="gone" />
 
     
 
@@ -71,6 +73,16 @@
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:text="Filter : Vintage"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:visibility="gone" />
+
+    <Spinner
+        android:id="@+id/filter_dropdown"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:entries="@array/filters_array"
+         />
           
 </RelativeLayout>

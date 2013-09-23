@@ -21,10 +21,15 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
+import android.widget.AdapterView.OnItemSelectedListener;
 
 
 public class MainActivity extends Activity 
@@ -45,6 +50,10 @@ public class MainActivity extends Activity
 	int activeFilter=0;
 	int numFilters=2;
 	TextView filterName;
+	
+	Spinner selectedFilter;
+	
+	int spinnerPosition;
 	
 	
 	public void onCreate(Bundle savedInstanceState) 
@@ -112,9 +121,11 @@ public class MainActivity extends Activity
 		filterName=(TextView)findViewById(R.id.filterName);
 				
 		implementVintageFilter();
-//		implementXPro2Filter();
+
 		
-		
+		selectedFilter=(Spinner)findViewById(R.id.filter_dropdown);
+		selectedFilter.setOnItemSelectedListener(new CustomOnItemSelectedListener());
+	
 		imgView.setImageBitmap(bmpmutable);
 		
 		origButton.setText("Original");
@@ -141,49 +152,78 @@ public class MainActivity extends Activity
 				else origButton.setText("Original");
 				origButton.invalidate();
 				
+				if(!showOriginalImage)
+				{
+					
+					if(spinnerPosition==0)
+						   implementVintageFilter();
+						else if(spinnerPosition==1)
+						   implementXPro2Filter();
+						else if (spinnerPosition==2)
+						   implementVividFilter();
+						else if(spinnerPosition==3)
+						   implementEarlyBirdFilter();
+						 
+						imgView.setImageBitmap(null);
+						imgView.setImageBitmap(bmpmutable);
+					
+				}
 				
 			}
 			
-			else if(v.getId()==127)
-			{			
-				activeFilter=(activeFilter+1)%numFilters;
-				
-				
-			}
 			
-			else if(v.getId()==126)
-			{
-				
-				activeFilter=(activeFilter-1)%numFilters;
-				if(activeFilter<0)
-					activeFilter=0;
-				
-			}
-			
-			if(activeFilter==0)
-					filterName.setText("Vintage");
-			else if(activeFilter==1)
-					filterName.setText("Calm Breeze");
-//			index=index%resIds.size();
 			
 			bmptobeManipulated=null;
 			bmptobeManipulated=BitmapFactory.decodeResource(activityContext.getResources(), resIds.get(index%resIds.size()));
-
-			Log.d("Ids "+v.getId(),"index"+index);
-			//imgView.setImageBitmap(null);
 			
-			if(!showOriginalImage)
-			{
-				if(activeFilter==0)
-				   implementVintageFilter();
-				else if(activeFilter==1)
-				   //implementXPro2Filter();
-				implementEarlyBirdFilter();
-				 
-				imgView.setImageBitmap(null);
-				imgView.setImageBitmap(bmpmutable);
-			}
-			else imgView.setImageBitmap(bmptobeManipulated);
+			if(showOriginalImage)
+			imgView.setImageBitmap(bmptobeManipulated);
+			
+			
+			
+			
+			
+//			
+//			else if(v.getId()==127)
+//			{			
+//				activeFilter=(activeFilter+1)%numFilters;
+//				
+//				
+//			}
+//			
+//			else if(v.getId()==126)
+//			{
+//				
+//				activeFilter=(activeFilter-1)%numFilters;
+//				if(activeFilter<0)
+//					activeFilter=0;
+//				
+//			}
+//			
+//			if(activeFilter==0)
+//					filterName.setText("Vintage");
+//			else if(activeFilter==1)
+//					filterName.setText("Calm Breeze");
+////			index=index%resIds.size();
+//			
+//			bmptobeManipulated=null;
+//			bmptobeManipulated=BitmapFactory.decodeResource(activityContext.getResources(), resIds.get(index%resIds.size()));
+//
+//			Log.d("Ids "+v.getId(),"index"+index);
+//			//imgView.setImageBitmap(null);
+//			
+//			if(!showOriginalImage)
+//			{
+//				if(activeFilter==0)
+//				   implementVintageFilter();
+//				else if(activeFilter==1)
+//				   //implementXPro2Filter();
+//				implementEarlyBirdFilter();
+//				 
+//				imgView.setImageBitmap(null);
+//				imgView.setImageBitmap(bmpmutable);
+//			}
+//			else imgView.setImageBitmap(bmptobeManipulated);
 			
 			
 			
@@ -676,39 +716,7 @@ public class MainActivity extends Activity
         bmOut.setPixels(pixels, 0, width, 0, 0, width, height);
         return bmOut;
     }
-	private void drawFoggyWindowWithTransparentCircle(Bitmap foggyWindowBmp ,
-	        float circleX, float circleY, float radius,Canvas combinedCanvas) {
 
-	    // Get the "foggy window" bitmap
-	   
-
-	    // Create a temporary bitmap
-	    Bitmap tempBitmap = Bitmap.createBitmap(
-	            foggyWindowBmp.getWidth(),
-	            foggyWindowBmp.getHeight(),
-	            Bitmap.Config.ARGB_8888);
-	    Canvas tempCanvas = new Canvas(tempBitmap);
-
-	    // Copy foggyWindowBmp into tempBitmap
-	    tempCanvas.drawBitmap(foggyWindowBmp, 0, 0, null);
-
-	    // Create a radial gradient
-	    RadialGradient gradient = new android.graphics.RadialGradient(
-	            circleX, circleY,
-	            radius, 0xFFFFFFFF, 0xFFB8B8B8,
-	            android.graphics.Shader.TileMode.CLAMP);
-
-	    // Draw transparent circle into tempBitmap
-	    Paint p = new Paint();
-	    p.setShader(gradient);
-	    p.setColor(0xFF000000);
-	    p.setXfermode(new PorterDuffXfermode(Mode.DST_OUT));
-	    tempCanvas.drawCircle(circleX, circleY, radius, p);
-
-	    // Draw tempBitmap onto the screen (over what's already there)
-	    combinedCanvas.drawBitmap(tempBitmap, 0, 0, null);
-	}
-	
 	public static double normalize ( int col ) 
 	{
 		return col / 255.0;
@@ -720,4 +728,45 @@ public class MainActivity extends Activity
 	    return ( col <0 ) ? 0 : col;
 	}
 	
+	public class CustomOnItemSelectedListener implements OnItemSelectedListener {
+		 
+		  public void onItemSelected(AdapterView<?> parent, View view, int pos,long id) {
+//		  Toast.makeText(parent.getContext(), 
+//		    "OnItemSelectedListener : " + parent.getItemAtPosition(pos).toString(),
+//		    Toast.LENGTH_SHORT).show();
+		 
+			    bmptobeManipulated=null;
+				bmptobeManipulated=BitmapFactory.decodeResource(activityContext.getResources(), resIds.get(index%resIds.size()));
+				filterName.setVisibility(View.VISIBLE);
+				filterName.setText("Loading ...");
+//				Log.d("Ids "+v.getId(),"index"+index);
+				//imgView.setImageBitmap(null);
+		
+				if(!showOriginalImage)
+				{
+					if(pos==0)
+					   implementVintageFilter();
+					else if(pos==1)
+					   implementXPro2Filter();
+					else if (pos==2)
+					   implementVividFilter();
+					else if(pos==3)
+					   implementEarlyBirdFilter();
+					 
+					imgView.setImageBitmap(null);
+					imgView.setImageBitmap(bmpmutable);
+				}
+				else imgView.setImageBitmap(bmptobeManipulated);
+				
+				spinnerPosition=pos;
+				filterName.setVisibility(View.INVISIBLE);
+			  
+		  }
+		 
+		  @Override
+		  public void onNothingSelected(AdapterView<?> arg0) {
+		  // TODO Auto-generated method stub
+		  }
+		 
+		}
 }

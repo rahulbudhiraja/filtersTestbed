@@ -4,5 +4,13 @@
     <string name="app_name">newImageFilters</string>
     <string name="dummy_button">Dummy Button</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
+    
+    <string-array name="filters_array">
+        <item>Vintage</item>
+        <item>Calm Breeze</item>
+        <item>Glorify</item>
+        <item>Pensive</item>
+    </string-array>
+ 
 
 </resources>
